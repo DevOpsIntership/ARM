@@ -1,0 +1,137 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "serverName": {
+      "type": "String",
+      "metadata": {
+        "description": "The name of the SQL logical server."
+      }
+    },
+    "sqlDBName": {
+      "type": "String",
+      "metadata": {
+        "description": "The name of the SQL Database."
+      }
+    },
+    "location": {
+      "type": "String",
+      "metadata": {
+        "description": "Location for all resources."
+      }
+    },
+    "administratorLogin": {
+      "type": "String",
+      "metadata": {
+        "description": "The administrator username of the SQL logical server."
+      }
+    },
+    "administratorLoginPassword": {
+      "type": "SecureString",
+      "metadata": {
+        "description": "The administrator password of the SQL logical server."
+      }
+    },
+    "weeklyRetention": {
+      "type": "String"
+    },
+    "monthlyRetention": {
+      "type": "String"
+    },
+    "yearlyRetention": {
+      "type": "String"
+    },
+    "weekOfYear": {
+      "type": "Int"
+    },
+    "diffBackupIntervalInHours": {
+      "type": "Int"
+    },
+    "retentionDays": {
+      "type": "Int"
+    },
+    "skuName": {
+      "type": "String"
+    },
+    "skuTier": {
+      "type": "String"
+    },
+    "IpRange": {
+      "type": "array",
+      "metadata": {
+        "description": "description"
+      }
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Sql/servers",
+      "apiVersion": "2021-08-01-preview",
+      "name": "[parameters('serverName')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "administratorLogin": "[parameters('administratorLogin')]",
+        "administratorLoginPassword": "[parameters('administratorLoginPassword')]"
+      }
+    },
+    {
+      "type": "Microsoft.Sql/servers/databases",
+      "apiVersion": "2021-08-01-preview",
+      "name": "[format('{0}/{1}', parameters('serverName'), parameters('sqlDBName'))]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Sql/servers', parameters('serverName'))]"
+      ],
+      "sku": {
+        "name": "[parameters('skuName')]",
+        "tier": "[parameters('skuTier')]"
+      }
+    },
+    {
+      "type": "Microsoft.Sql/servers/databases/backupLongTermRetentionPolicies",
+      "apiVersion": "2021-05-01-preview",
+      "name": "[format('{0}/{1}/{2}', parameters('serverName'), parameters('sqlDBName'),'Default')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Sql/servers/databases', parameters('serverName'),parameters('sqlDBName'))]"
+      ],
+      "properties": {
+        "weeklyRetention": "[parameters('weeklyRetention')]",
+        "monthlyRetention": "[parameters('monthlyRetention')]",
+        "yearlyRetention": "[parameters('yearlyRetention')]",
+        "weekOfYear": "[parameters('weekOfYear')]"
+      }
+    },
+    {
+      "type": "Microsoft.Sql/servers/databases/backupShortTermRetentionPolicies",
+      "apiVersion": "2021-05-01-preview",
+      "name": "[format('{0}/{1}/{2}', parameters('serverName'), parameters('sqlDBName'),'Default')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Sql/servers/databases', parameters('serverName'),parameters('sqlDBName'))]"
+      ],
+      "properties": {
+        "diffBackupIntervalInHours": "[parameters('diffBackupIntervalInHours')]",
+        "retentionDays": "[parameters('retentionDays')]"
+      }
+    },
+      {
+        "type": "Microsoft.Sql/servers/firewallRules",
+        "apiVersion": "2021-11-01-preview",
+        "copy": {
+          "name": "rules",
+          "count": "[length(parameters('IpRange'))]"
+        },
+        "name": "[format('{0}/{1}',parameters('serverName'),parameters('IpRange')[copyIndex('rules')].name)]",
+        "properties":{
+          "startIpAddress":"[parameters('IpRange')[copyIndex('rules')].startIpAddress]",
+          "endIpAddress": "[parameters('IpRange')[copyIndex('rules')].endIpAddress]"
+        }
+        
+          
+      }
+
+      
+
+ 
+      
+  ]
+}

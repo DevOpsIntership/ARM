@@ -1,0 +1,56 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "serverName": {
+            "value": "adkwolekserver" 
+        },
+        "sqlDBName": {
+            "value": "SampleDB"
+        },
+        "location": {
+            "value": "eastus" 
+        },
+        "administratorLogin": {
+            "value": "adkwolek" 
+        },
+        "administratorLoginPassword": {
+            "value": "AFcO0#23Z7XO" 
+        },
+        "weeklyRetention": {
+            "value": "P0W" 
+        },
+        "monthlyRetention": {
+            "value": "P0W" 
+        },
+        "yearlyRetention": {
+            "value": "P0W" 
+        },
+        "weekOfYear": {
+            "value": 1
+        },
+        "diffBackupIntervalInHours": {
+            "value": 12 
+        },
+        "retentionDays": {
+            "value": 1 
+        },
+        "skuName": {
+            "value": "Standard"
+        },
+        "skuTier": {
+            "value": "Standard" 
+        },
+
+        "IpRange": {
+            "value": [
+                {
+                    "name": "My1Rule",
+                    "startIpAddress": "89.151.39.134",
+                    "endIpAddress": "89.151.39.134"
+                    
+                }
+            ]
+        }
+    }
+}
