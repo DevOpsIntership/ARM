@@ -1,0 +1,21 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "WebAppName": {
+            "value": "Mytestappbackup" 
+        },
+        "backupname": {
+            "value": "backup" 
+        },
+        "Repeatseveryday": {
+            "value": 7 
+        },
+        "StartTime": {
+            "value": "8/30/2022 9:00"
+        },
+        "Retention": {
+            "value": 30 
+        }
+    }
+}

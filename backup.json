@@ -1,0 +1,40 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "WebAppName": {
+            "type": "string"
+        },
+        "backupname": {
+            "type": "string"
+        },
+           "Repeatseveryday": {
+            "type": "Int"
+        },
+             "StartTime": {
+            "type": "string"
+        },
+              "Retention": {
+            "type": "Int"
+        }
+    }, 
+    "resources": [{
+  "type": "Microsoft.Web/sites/config",
+  "apiVersion": "2022-03-01",
+  "name": "[concat(parameters('WebAppName'),'/',parameters('backupname'))]",
+  "properties": {
+    "backupName": "[parameters('backupname')]",
+    "backupSchedule": {
+      "frequencyInterval": "[parameters('Repeatseveryday')]",
+      "frequencyUnit": "Day",
+      "keepAtLeastOneBackup": "bool",
+      "retentionPeriodInDays": "[parameters('Retention')]",
+      "startTime": "[parameters('StartTime')]"
+    },
+
+    "enabled": "bool",
+    "storageAccountUrl": "https://adam980220strg.blob.core.windows.net/backup?sp=racwdli&st=2022-08-30T09:17:54Z&se=2023-02-01T18:17:54Z&spr=https&sv=2021-06-08&sr=c&sig=eMs1qGp1TZAmWzEhZgy0ytrF%2B%2FJMq1ef5kSwQqdewyI%3D"
+  }
+}]
+    
+}
