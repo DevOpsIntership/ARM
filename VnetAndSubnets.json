@@ -1,0 +1,117 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "VnetName": {
+            "type": "string",
+            "metadata": {
+                "description": "Enter your Vnet Name"
+            }
+        
+        },
+        "VnetSubnets": {
+            "type": "array",
+            "metadata": {
+                "description": "Enter Your Subnets"
+            }
+        },
+
+        "VnetCidr": {
+            "type": "string",
+            "metadata": {
+                "description": "Enter your Cidr"
+            }
+        },
+
+        "NsgRules": {
+            "type": "array",
+            "metadata": {
+                "description": "description"
+            }
+        }
+
+    },
+    "variables": {
+        "Location": "[resourceGroup().location]",
+        "uid": "[uniqueString(resourceGroup().id)]"
+    },
+    "resources": [
+        {
+            "name": "[concat(parameters('VnetName'),'-',variables('uid'))]",
+            "type": "Microsoft.Network/virtualNetworks",
+            "apiVersion": "2022-01-01",
+            "location": "[variables('Location')]",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                       "[parameters('VnetCidr')]"
+                    ]
+                }
+                
+            }
+        },
+        {
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2020-11-01",
+            "copy": {
+                "name":"nsggroups",
+                "count":"[length(parameters('VnetSubnets'))]",
+                "mode": "Parallel"
+            },
+
+            "name": "[parameters('VnetSubnets')[copyIndex('nsggroups')].nsg]",
+            "location": "[variables('Location')]"
+            
+
+        },
+            {
+                "type": "Microsoft.Network/networkSecurityGroups/securityRules",
+                "apiVersion": "2020-11-01",
+                "copy": {
+                    "name":"nsgrules",
+                    "count":"[length(parameters('NsgRules'))]",
+                    "mode": "Parallel"
+
+                },
+                "dependsOn": ["nsggroups"],
+                "name": "[concat(parameters('NsgRules')[copyIndex('nsgrules')].nsg ,'/',parameters('NsgRules')[copyIndex('nsgrules')].name)]",
+                "properties":{
+                    "access": "[parameters('NsgRules')[copyIndex('nsgrules')].access]",
+                    "priority": "[parameters('NsgRules')[copyIndex('nsgrules')].priority]",
+                    "direction": "[parameters('NsgRules')[copyIndex('nsgrules')].direction]",
+                    "protocol": "[parameters('NsgRules')[copyIndex('nsgrules')].protocol]",
+                    "destinationPortRange":"[parameters('NsgRules')[copyIndex('nsgrules')].port]",
+                    "sourceAddressPrefix":"[parameters('NsgRules')[copyIndex('nsgrules')].cidr]",
+                    "sourcePortRange": "*",
+                    "destinationAddressPrefix": "*"
+
+                    }
+            },
+
+            {
+                "type": "Microsoft.Network/virtualNetworks/subnets",
+                "apiVersion": "2020-11-01",
+                "copy": {
+                    "name":"subnets",
+                    "count":"[length(parameters('VnetSubnets'))]",
+                    "mode": "Serial"
+                },
+                     "dependsOn": [
+                    "[resourceId('Microsoft.Network/virtualNetworks', concat(parameters('VnetName'),'-',variables('uid')))]",
+                        "nsgrules"
+                     ],
+                   "name": "[concat(parameters('VnetName'),'-',variables('uid'),'/',parameters('VnetSubnets')[copyIndex('subnets')].name)]",
+                   "properties":{
+                   "addressPrefix":"[parameters('VnetSubnets')[copyIndex('subnets')].cidr]",
+                   "networkSecurityGroup":{
+                    "id":"[resourceId('Microsoft.Network/networkSecurityGroups',parameters('VnetSubnets')[copyIndex('subnets')].nsg)]"     
+                }
+
+                   }
+                   
+                    
+
+            }
+    ],
+    "outputs": {}
+}

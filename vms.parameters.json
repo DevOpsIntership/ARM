@@ -1,0 +1,51 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "Vms": {
+            "value": [
+                {
+                    "name": "agent1",
+                    "Ipname":"Ipagent1",
+                    "publicIPAllocationMethod":"Dynamic",
+                    "subnet":"agentssubnet",
+                    "Vmsize":"Standard_D1_v2",
+                    "diskname":"agent1-OSDisk",
+                    "disksku":"Standard_LRS",
+                    "publisher": "Canonical",
+                    "offer": "UbuntuServer",
+                    "sku": "16.04-LTS"
+
+                },
+
+                {
+                    "name": "agent2",
+                    "Ipname":"Ipagent2",
+                    "publicIPAllocationMethod":"Dynamic",
+                    "subnet":"agentssubnet",
+                    "Vmsize":"Standard_D1_v2",
+                    "diskname":"agent2-OSDisk",
+                    "disksku":"Standard_LRS",
+                    "publisher": "Canonical",
+                    "offer": "UbuntuServer",
+                    "sku": "16.04-LTS"
+                },
+
+                {
+                    "name": "jumpbox",
+                    "Ipname":"Ipjumpbox",
+                    "publicIPAllocationMethod":"Static",
+                    "subnet":"jumpboxsubnet",
+                    "Vmsize":"Standard_D1_v2",
+                    "diskname":"jumpbox-OSDisk",
+                    "disksku":"Standard_LRS",
+                    "publisher": "MicrosoftWindowsServer",
+                    "offer": "WindowsServer",
+                    "sku": "2019-Datacenter"
+                }    
+            ]
+        }
+        
+      
+    }
+}
