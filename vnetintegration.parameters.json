@@ -1,0 +1,30 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "VnetName": {
+            "value": "MyVnet"
+        },
+        "VnetSubnets": {
+            "value": [
+                {
+                    "name": "Integration",
+                    "cidr": "192.168.0.0/26"
+                },
+
+                {
+                    "name": "appgw",
+                    "cidr": "192.168.1.0/24"
+                },
+                {
+                    "name": "endpoint",
+                    "cidr": "192.168.2.0/24"
+                }
+            ]
+        },
+
+        "VnetCidr": {
+            "value": "192.168.0.0/16" 
+        }
+    }
+}

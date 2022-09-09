@@ -1,0 +1,82 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.9.1.41621",
+      "templateHash": "8333065333412290965"
+    }
+  },
+  "variables": {
+    "subnetid": "[resourceId('Microsoft.Network/virtualNetworks/subnets', 'MyVnet', 'endpoint')]",
+    "virtualnetwork": "[resourceId('Microsoft.Network/virtualNetworks', 'MyVnet')]",
+    "webapp": "[resourceId('Microsoft.Web/sites', 'wapp-adkwolek')]",
+    "dnszonename": "privatelink.azurewebsites.net"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Network/privateEndpoints",
+      "apiVersion": "2021-05-01",
+      "name": "adkwolekEndpoint",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "subnet": {
+          "id": "[variables('subnetid')]"
+        },
+        "privateLinkServiceConnections": [
+          {
+            "name": "adkwolekEndpoint",
+            "properties": {
+              "privateLinkServiceId": "[variables('webapp')]",
+              "groupIds": [
+                "sites"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Network/privateDnsZones",
+      "apiVersion": "2020-06-01",
+      "name": "privatelink.azurewebsites.net",
+      "location": "global",
+      "properties": {}
+    },
+    {
+      "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
+      "apiVersion": "2020-06-01",
+      "name": "[format('{0}/{1}', 'privatelink.azurewebsites.net', format('{0}-link', variables('dnszonename')))]",
+      "location": "global",
+      "properties": {
+        "registrationEnabled": false,
+        "virtualNetwork": {
+          "id": "[variables('virtualnetwork')]"
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/privateDnsZones', 'privatelink.azurewebsites.net')]"
+      ]
+    },
+    {
+      "type": "Microsoft.Network/privateEndpoints/privateDnsZoneGroups",
+      "apiVersion": "2021-05-01",
+      "name": "[format('{0}/{1}', 'adkwolekEndpoint', 'DnzEndpointGroup')]",
+      "properties": {
+        "privateDnsZoneConfigs": [
+          {
+            "name": "config1",
+            "properties": {
+              "privateDnsZoneId": "[resourceId('Microsoft.Network/privateDnsZones', 'privatelink.azurewebsites.net')]"
+            }
+          }
+        ]
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/privateDnsZones', 'privatelink.azurewebsites.net')]",
+        "[resourceId('Microsoft.Network/privateEndpoints', 'adkwolekEndpoint')]"
+      ]
+    }
+  ]
+}
