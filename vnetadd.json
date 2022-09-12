@@ -1,0 +1,28 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "webAppName": {
+            "type": "string",
+            "defaultValue":"adkwolekWebapp"
+        }
+    },
+    "functions": [],
+    "variables": {},
+    "resources": [
+          {
+            "type": "Microsoft.Web/sites/networkConfig",
+            "name": "[concat(parameters('webAppName'),'/VirtualNetwork')]",
+            "apiVersion": "2016-08-01",
+            "properties": 
+            {
+                "subnetResourceId": "[resourceId('Microsoft.Network/virtualNetworks/subnets','MyVnet','Integration')]"
+            }
+}
+    ],
+    "outputs": {}
+}
+
+
+
+      
